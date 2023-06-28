@@ -2,9 +2,10 @@ package com.skydream.scoringserver.service;
 
 import com.skydream.scoringserver.model.SolutionDto;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +16,7 @@ public class ScoringService implements IScoringService {
 
 
     @Override
-    public String score(SolutionDto solutionDto) throws IOException {
+    public String score(SolutionDto solutionDto) throws IOException, InterruptedException {
         saveUserCodeFile(solutionDto);
 
         System.out.println("컴파일 시작");
@@ -52,4 +53,16 @@ public class ScoringService implements IScoringService {
 
         return sb.toString();
     }
+
+    private void compile() throws IOException, InterruptedException {
+        String cmd = "cmd /c cd src/main/resources/usercode && javac Main.java";
+        Process p = Runtime.getRuntime().exec(cmd);
+        int exitCode = p.waitFor();
+
+        File file = new File("C:\\Create\\development\\edu\\ssafy\\secondSem\\ScoringServer\\src\\main\\resources\\usercode\\Main.class");
+        if (!file.exists()) {
+            throw new FileNotFoundException("컴파일이 정상적으로 실행되지 않았습니다.");
+        }
+    }
+
 }
