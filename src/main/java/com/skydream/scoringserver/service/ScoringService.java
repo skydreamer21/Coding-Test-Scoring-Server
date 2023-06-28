@@ -2,10 +2,13 @@ package com.skydream.scoringserver.service;
 
 import com.skydream.scoringserver.model.SolutionDto;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +24,15 @@ public class ScoringService implements IScoringService {
 
         System.out.println("컴파일 시작");
         compile();
-        return "SUCCESS";
+        System.out.println("실행");
+        String userResult = execute();
+        String answer = readAnswer();
+        System.out.printf("결과 : %s, 정답 : %s\n", userResult, answer);
+        if (userResult.equals(answer)) {
+            return "SUCCESS";
+        } else {
+            return "FAIL";
+        }
     }
 
     private void saveUserCodeFile(SolutionDto solutionDto) {
@@ -65,4 +76,31 @@ public class ScoringService implements IScoringService {
         }
     }
 
+    private String execute() throws IOException, InterruptedException {
+        String cmd = "cmd /c cd src/main/resources/usercode && java Main";
+        Process p = Runtime.getRuntime().exec(cmd);
+//        int exitCode = p.waitFor();
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String l = null;
+        StringBuffer sb = new StringBuffer();
+//        sb.append(cmd).append("\n");
+
+//        System.out.println("결과 저장");
+        int cnt = 0;
+        while ((l = br.readLine()) != null && cnt++ < 30) {
+//            System.out.println("한줄 저장됨");
+            sb.append(l);
+            sb.append("\n");
+        }
+
+        return sb.toString().trim();
+    }
+
+    private String readAnswer() throws IOException {
+        BufferedReader br = new BufferedReader(
+                new FileReader("C:\\Create\\development\\edu\\ssafy\\secondSem\\ScoringServer\\src\\main\\resources\\testcase\\output1.txt")
+        );
+        return br.readLine().trim();
+    }
 }
