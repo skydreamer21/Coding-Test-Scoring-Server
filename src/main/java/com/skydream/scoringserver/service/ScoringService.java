@@ -15,7 +15,8 @@ import java.util.regex.Pattern;
 
 @org.springframework.stereotype.Service
 public class ScoringService implements IScoringService {
-    private static final String USER_CODE_PATH ="C:\\Create\\development\\edu\\ssafy\\secondSem\\ScoringServer\\src\\main\\resources\\usercode\\Main.java";
+    private static final String PROJECT_PATH = System.getProperty("user.dir");
+    private static final String USER_CODE_PATH = PROJECT_PATH + "\\src\\main\\resources\\usercode\\Main.java";
 
 
     @Override
@@ -51,7 +52,7 @@ public class ScoringService implements IScoringService {
 
     private String modifyCode(String code) {
         String inputSettingCode = "\nString curDirPath = System.getProperty(\"user.dir\");\n" +
-                "        String filePath = \"\\\\..\\\\testcase\\\\input1.txt\";\n" +
+                "        String filePath = \"\\\\..\\\\..\\\\..\\\\input\\\\input1.txt\";\n" +
                 "        System.setIn(new FileInputStream(curDirPath + filePath));";
 
         String pattern = ".*public static void main.*\\{.*";
@@ -70,7 +71,7 @@ public class ScoringService implements IScoringService {
         Process p = Runtime.getRuntime().exec(cmd);
         int exitCode = p.waitFor();
 
-        File file = new File("C:\\Create\\development\\edu\\ssafy\\secondSem\\ScoringServer\\src\\main\\resources\\usercode\\Main.class");
+        File file = new File(PROJECT_PATH + "\\src\\main\\resources\\usercode\\Main.class");
         if (!file.exists()) {
             throw new FileNotFoundException("컴파일이 정상적으로 실행되지 않았습니다.");
         }
@@ -99,7 +100,7 @@ public class ScoringService implements IScoringService {
 
     private String readAnswer() throws IOException {
         BufferedReader br = new BufferedReader(
-                new FileReader("C:\\Create\\development\\edu\\ssafy\\secondSem\\ScoringServer\\src\\main\\resources\\testcase\\output1.txt")
+                new FileReader(PROJECT_PATH + "\\src\\output\\output1.txt")
         );
         return br.readLine().trim();
     }
